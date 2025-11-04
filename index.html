@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grimório de Griggs</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+</head>
+<body>
+  <nav>
+    <h1>Grimório de Griggs</h1>
+    <ul>
+      <li><a href="#" onclick="showPage('spellbook')">Spellbook</a></li>
+      <li><a href="#" onclick="showPage('cast')">Cast Spells</a></li>
+      <li><a href="#" onclick="openSettings()">⚙️ Settings</a></li>
+      <li><a href="#" onclick="openSpellManager()">📜 Manage Spells</a></li>
+    </ul>
+  </nav>
+
+  <div id="spellbook" class="page active">
+    <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
+        Unprepare All Spells
+    </button>
+    <input id="search" type="text" placeholder="Search spells...">
+    <div id="spells">Loading...</div>
+  </div>
+
+  <div id="cast" class="page">
+    <h2>Cast Spells</h2>
+    <button id="restButton" class="rest-button">Rest (Restore All Casts)</button>
+    <p>Separated by level (bold = specialist slot):</p>
+    <ul id="checkedList"></ul>
+  </div>
+  
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h2>Spell & Cast Settings</h2>
+      <p>Configure your daily spell limits and specialization mode.</p>
+
+      <div id="specialistOptions" style="margin-bottom: 1rem;">
+        <label style="margin-right:1rem;">
+          <input type="checkbox" id="isSpecialist"> Specialist
+        </label>
+        <label style="margin-right:1rem;">
+          <input type="checkbox" id="isHighSpecialist"> High Specialist
+        </label>
+
+        <label for="specialistSchool" style="font-weight:600;">School:</label>
+        <select id="specialistSchool" style="background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;margin-left:0.5rem;">
+          <option value="">-- None --</option>
+          <option value="abjuration">Abjuration</option>
+          <option value="conjuration">Conjuration</option>
+          <option value="divination">Divination</option>
+          <option value="enchantment">Enchantment</option>
+          <option value="evocation">Evocation</option>
+          <option value="illusion">Illusion</option>
+          <option value="necromancy">Necromancy</option>
+          <option value="transmutation">Transmutation</option>
+        </select>
+      </div>
+
+
+      <form id="settingsForm"></form>
+
+      <div class="modal-actions">
+        <button id="saveSettings" type="button">Save</button>
+        <button id="closeSettings" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="spellManagerModal" class="modal">
+    <div class="modal-content">
+      <h2>Manage Spells</h2>
+      <p>Select which spells should appear in your spellbook.</p>
+      
+      <input id="spellSearchManager" type="text" placeholder="Search spells..." style="width:100%;margin-bottom:0.5rem;">
+      <div id="spellFilterBar" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+        <select id="spellFilterKey" style="background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;">
+          <option value="">Filter by...</option>
+          <option value="level">Level</option>
+          <option value="components">Components</option>
+          <option value="casting time">Casting Time</option>
+          <option value="range">Range</option>
+          <option value="duration">Duration</option>
+          <option value="saving throw">Saving Throw</option>
+          <option value="spell resistance">Spell Resistance</option>
+          <option value="school">School</option>
+          <option value="description">Description</option>
+        </select>
+        <input id="spellFilterValue" type="text" placeholder="Enter filter value..." style="flex:1;min-width:150px;background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;">
+        <button id="applySpellFilter" style="background:#444;color:#fff;border:none;border-radius:4px;padding:0.25rem 0.8rem;cursor:pointer;">Apply Filters</button>
+        <button id="clearSpellFilter" style="background:#800000;color:#fff;border:none;border-radius:4px;padding:0.25rem 0.8rem;cursor:pointer;">Clear</button>
+      </div>
+      <div id="spellManagerList" style="max-height:400px;overflow-y:auto;border:1px solid #333;padding:0.5rem;border-radius:6px;background:#222;"></div>
+
+      <div class="modal-actions">
+        <button id="saveSpellSelection" type="button">Save Selection</button>
+        <button id="closeSpellManager" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
