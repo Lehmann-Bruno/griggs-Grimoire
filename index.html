@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grimório de Griggs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav id="spell-navbar" class="navbar-active">
+    <h1>Grimório de Griggs</h1>
+      <ul class="options">
+        <li id="nav-spellbook" class="spells-button"><a href="#" onclick="showPage('spellbook')">Spellbook</a></li>
+        <li id="nav-cast" class="spells-button"><a href="#" onclick="showPage('cast')">Cast Spells</a></li>
+        <li id="nav-settings" class="spells-button"><a href="#" onclick="openSettings()">Settings</a></li>
+        <li id="nav-manager" class="spells-button"><a href="#" onclick="openSpellManager()">Manage Spells</a></li>
+
+        <li class="nav-divider"></li>
+
+        <li id="nav-magic" class="nav-pages"><a href="#" onclick="showNavbar('magic')">Magic</a></li>
+        <li id="nav-character"class="nav-pages"><a href="#" onclick="showNavbar('character')">Character Sheet</a></li>
+    </ul>
+  </nav>
+
+  <nav id="character-navbar" class="navbar">
+  <h1>Grimório de Griggs</h1>
+      <ul class="options">
+        <li id="nav-main" class="character-button"><a href="#" onclick="showPage('main')">Main</a></li>
+        <li id="nav-skills" class="character-button"><a href="#">Skills</a></li>
+        <li id="nav-feats" class="character-button"><a href="#">Feats</a></li>
+        <li id="nav-equipment" class="character-button"><a href="#">Equipment</a></li>
+        <li id="nav-notes" class="character-button"><a href="#">Notes</a></li>
+
+        <li class="nav-divider"></li>
+
+        <li id="nav-magic" class="nav-pages"><a href="#" onclick="showNavbar('magic')">Magic</a></li>
+        <li id="nav-character"class="nav-pages"><a href="#" onclick="showNavbar('character')">Character Sheet</a></li>
+    </ul>
+  </nav>
+
+<!-- ... keep your spellbook/cast/etc ... -->
+
+  <div id="magic" class="page">aloaloalo</div>
+  <div id="main" class="page">aloaloalo</div>
+
+  <div id="character" class="page">
+    <h2>Character Sheet</h2>
+    <p>This is where your character’s details, skills, feats, and equipment will go.</p>
+    <div id="character-buttons" class="button-container"></div>
+  </div>
+
+  <div id="spellbook" class="page active">
+    <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
+        Unprepare All Spells
+    </button>
+    <input id="search" type="text" placeholder="Search spells...">
+    <div id="spells">Loading...</div>
+  </div>
+
+  <div id="cast" class="page">
+    <div class="cast-layout">
+      <div class="cast-list">
+        <h2>Cast Spells</h2>
+        <div id="checkedList"></div>
+      </div>
+
+      <div class="cast-right">
+        <div id="spellDetail" class="spell-detail">
+          <p class="placeholder">Hover over a spell to view its details.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="placeholder" class="page">
+    <h2>Placeholder Page</h2>
+    <p>This is your new section.</p>
+    <div id="placeholder-buttons" class="button-container">
+    </div>
+  </div>
+  
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h2>Spell & Cast Settings</h2>
+      <p>Configure your daily spell limits and specialization mode.</p>
+
+      <div id="specialistOptions" style="margin-bottom: 1rem;">
+        <label style="margin-right:1rem;">
+          <input type="checkbox" id="isSpecialist"> Specialist
+        </label>
+        <label style="margin-right:1rem;">
+          <input type="checkbox" id="isHighSpecialist"> High Specialist
+        </label>
+
+        <label for="specialistSchool" style="font-weight:600;">School:</label>
+        <select id="specialistSchool" style="background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;margin-left:0.5rem;">
+          <option value="">-- None --</option>
+          <option value="abjuration">Abjuration</option>
+          <option value="conjuration">Conjuration</option>
+          <option value="divination">Divination</option>
+          <option value="enchantment">Enchantment</option>
+          <option value="evocation">Evocation</option>
+          <option value="illusion">Illusion</option>
+          <option value="necromancy">Necromancy</option>
+          <option value="transmutation">Transmutation</option>
+        </select>
+      </div>
+
+
+      <form id="settingsForm"></form>
+
+      <div class="modal-actions">
+        <button id="saveSettings" type="button">Save</button>
+        <button id="closeSettings" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="spellManagerModal" class="modal">
+    <div class="modal-content">
+      <h2>Manage Spells</h2>
+      <p>Select which spells should appear in your spellbook.</p>
+      
+      <input id="spellSearchManager" type="text" placeholder="Search spells..." style="width:100%;margin-bottom:0.5rem;">
+      <div id="spellFilterBar" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+        <select id="spellFilterKey" style="background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;">
+          <option value="">Filter by...</option>
+          <option value="level">Level</option>
+          <option value="components">Components</option>
+          <option value="casting time">Casting Time</option>
+          <option value="range">Range</option>
+          <option value="duration">Duration</option>
+          <option value="saving throw">Saving Throw</option>
+          <option value="spell resistance">Spell Resistance</option>
+          <option value="school">School</option>
+          <option value="description">Description</option>
+        </select>
+        <input id="spellFilterValue" type="text" placeholder="Enter filter value..." style="flex:1;min-width:150px;background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;">
+        <button id="applySpellFilter" style="background:#444;color:#fff;border:none;border-radius:4px;padding:0.25rem 0.8rem;cursor:pointer;">Apply Filters</button>
+        <button id="clearSpellFilter" style="background:#800000;color:#fff;border:none;border-radius:4px;padding:0.25rem 0.8rem;cursor:pointer;">Clear</button>
+      </div>
+      <div id="spellManagerList" style="max-height:400px;overflow-y:auto;border:1px solid #333;padding:0.5rem;border-radius:6px;background:#222;"></div>
+
+      <div class="modal-actions">
+        <button id="saveSpellSelection" type="button">Save Selection</button>
+        <button id="closeSpellManager" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
