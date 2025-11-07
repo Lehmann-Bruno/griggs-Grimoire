@@ -1,0 +1,32 @@
+{
+  "name": "Griggs the Arcanist",
+  "class": "Wizard 4",
+  "race": "Human",
+  "alignment": "Neutral Good",
+  "level": 4,
+  "hp": 12,
+  "ac": 16,
+  "speed": 30,
+  "stats": {
+    "STR": 10,
+    "DEX": 18,
+    "CON": 18,
+    "INT": 18,
+    "WIS": 10,
+    "CHA": 10
+  },
+  "skills": {
+    "appraise": { "abilityMod": 4, "rank": 1, "misc": 0 },
+    "balance": { "abilityMod": 2, "rank": 0, "misc": 0 },
+    "bluff": { "abilityMod": -1, "rank": 0, "misc": 2 },
+    "concentration": { "abilityMod": 1, "rank": 9, "misc": 0 },
+    "diplomacy": { "abilityMod": -1, "rank": 3, "misc": 1 },
+    "spellcraft": { "abilityMod": 4, "rank": 8, "misc": 0 },
+    "knowledge_arcana": { "abilityMod": 4, "rank": 7, "misc": 0 }
+  },
+  "equipment": [
+    "Spellbook",
+    "Cloak of Resistance +1",
+    "Wand of Magic Missile (CL 5)"
+  ]
+}

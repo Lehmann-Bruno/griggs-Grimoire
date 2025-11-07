@@ -1,0 +1,9 @@
+[
+  { "id": "appraise", "name": "Appraise", "ability": "INT" },
+  { "id": "balance", "name": "Balance", "ability": "DEX" },
+  { "id": "bluff", "name": "Bluff", "ability": "CHA" },
+  { "id": "concentration", "name": "Concentration", "ability": "CON" },
+  { "id": "diplomacy", "name": "Diplomacy", "ability": "CHA" },
+  { "id": "spellcraft", "name": "Spellcraft", "ability": "INT", "trainedOnly": true },
+  { "id": "knowledge_arcana", "name": "Knowledge (Arcana)", "ability": "INT", "trainedOnly": true }
+]

@@ -4,46 +4,49 @@
   <meta charset="UTF-8">
   <title>Grimório de Griggs</title>
   <link rel="stylesheet" href="style.css">
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app);
-</script>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
+  <!-- ======= MAIN NAVBAR ======= -->
   <nav>
     <h1>Grimório de Griggs</h1>
     <ul>
+      <li><a href="#" onclick="loadCharacterSheet('character')">🧙 Character Sheet</a></li>
       <li><a href="#" onclick="showPage('spellbook')">Spellbook</a></li>
-      <li><a href="#" onclick="showPage('cast')">Cast Spells</a></li>
-      <li><a href="#" onclick="openSettings()">⚙️ Settings</a></li>
-      <li><a href="#" onclick="openSpellManager()">📜 Manage Spells</a></li>
     </ul>
   </nav>
 
+  <!-- ======= CHARACTER PAGE ======= -->
+  <div id="character" class="page"></div>
+
+  <!-- ======= SPELLBOOK PAGE ======= -->
   <div id="spellbook" class="page active">
+    
+    <!-- Secondary Navbar inside Spellbook -->
+    <nav class="subnav">
+      <ul>
+        <li><a href="#" onclick="showPage('cast')">⚔️ Cast Spells</a></li>
+        <li><a href="#" onclick="openSpellManager()">📜 Manage Spells</a></li>
+        <li><a href="#" onclick="openSettings()">⚙️ Settings</a></li>
+      </ul>
+    </nav>
+
     <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
-        Unprepare All Spells
+      Unprepare All Spells
     </button>
     <input id="search" type="text" placeholder="Search spells...">
     <div id="spells">Loading...</div>
   </div>
 
+  <!-- ======= CAST PAGE ======= -->
   <div id="cast" class="page">
     <h2>Cast Spells</h2>
     <button id="restButton" class="rest-button">Rest (Restore All Casts)</button>
     <p>Separated by level (bold = specialist slot):</p>
     <ul id="checkedList"></ul>
   </div>
-  
+
+  <!-- ======= SETTINGS MODAL ======= -->
   <div id="settingsModal" class="modal">
     <div class="modal-content">
       <h2>Spell & Cast Settings</h2>
@@ -56,7 +59,6 @@
         <label style="margin-right:1rem;">
           <input type="checkbox" id="isHighSpecialist"> High Specialist
         </label>
-
         <label for="specialistSchool" style="font-weight:600;">School:</label>
         <select id="specialistSchool" style="background:#222;border:1px solid #333;color:#fff;border-radius:4px;padding:0.25rem;margin-left:0.5rem;">
           <option value="">-- None --</option>
@@ -71,7 +73,6 @@
         </select>
       </div>
 
-
       <form id="settingsForm"></form>
 
       <div class="modal-actions">
@@ -81,6 +82,7 @@
     </div>
   </div>
 
+  <!-- ======= SPELL MANAGER MODAL ======= -->
   <div id="spellManagerModal" class="modal">
     <div class="modal-content">
       <h2>Manage Spells</h2>

@@ -24,8 +24,8 @@ function showPage(pageId) {
  renderChecked();
  }
 }
+
 // ==== CLEAR ALL PREPARED SPELLS ====
-// ==== CLEAR ALL PREPARED SPELLS (no confirm dialog needed) ====
 document.getElementById("clearAllButton").addEventListener("click", () => {
  // Custom in-page confirmation (since browser confirm() may be blocked)
  const btn = document.getElementById("clearAllButton");
@@ -50,11 +50,149 @@ document.getElementById("clearAllButton").addEventListener("click", () => {
  btn.dataset.confirmed = "";
  setTimeout(() => (btn.textContent = "Unprepare All Spells"), 2000);
 });
+
+// ==== LOAD CHARACTER SHEET (external page) ====
+async function loadCharacterSheet() {
+  const container = document.getElementById("character");
+  container.innerHTML = "<p style='color:#888;'>Loading character...</p>";
+
+  try {
+    const res = await fetch("character.json");
+    if (!res.ok) throw new Error("Could not load character.json");
+    const charData = await res.json();
+
+    renderCharacterSheet(charData);
+    showPage("character");
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `<p style="color:#c00;">Error: ${err.message}</p>`;
+  }
+}
+
+function renderCharacterSheet(c) {
+  const container = document.getElementById("character");
+
+  container.innerHTML = `
+    <div class="char-card">
+      <h2 style="color:#ffcc00;margin-bottom:0.5rem;">${c.name}</h2>
+      <p><strong>Class:</strong> ${c.class}</p>
+      <p><strong>Race:</strong> ${c.race}</p>
+      <p><strong>Alignment:</strong> ${c.alignment}</p>
+      <p><strong>Level:</strong> ${c.level}</p>
+
+      <!-- Tabs -->
+      <div class="char-tabs" style="margin-top:1rem;display:flex;gap:0.5rem;">
+        <button id="tab-main" class="tab-button active-tab">Main Stats</button>
+        <button id="tab-skills" class="tab-button">Skills</button>
+      </div>
+
+      <!-- Content area -->
+      <div id="char-content" style="margin-top:1rem;"></div>
+    </div>
+  `;
+
+  // === RENDER DEFAULT TAB ===
+  renderMainStats(c);
+
+  // === TAB SWITCHING ===
+  document.getElementById("tab-main").addEventListener("click", () => {
+    setActiveTab("main");
+    renderMainStats(c);
+  });
+
+  document.getElementById("tab-skills").addEventListener("click", () => {
+    setActiveTab("skills");
+    renderSkillsDynamic();
+  });
+
+}
+
+// helper to toggle active button style
+function setActiveTab(tab) {
+  document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active-tab"));
+  document.getElementById(`tab-${tab}`).classList.add("active-tab");
+}
+
+// main stats tab
+function renderMainStats(c) {
+  const content = document.getElementById("char-content");
+  content.innerHTML = `
+    <h3 style="color:#ffcc00;">Attributes</h3>
+    <div class="char-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+      ${Object.entries(c.stats)
+        .map(([k, v]) => `<div class="stat-box">${k}: <span>${v}</span></div>`)
+        .join("")}
+    </div>
+
+    <h3 style="color:#ffcc00;margin-top:1rem;">HP & Defense</h3>
+    <p><strong>HP:</strong> ${c.hp}</p>
+    <p><strong>AC:</strong> ${c.ac}</p>
+    <p><strong>Speed:</strong> ${c.speed} ft</p>
+
+    <h3 style="color:#ffcc00;margin-top:1rem;">Equipment</h3>
+    <ul>${c.equipment.map(e => `<li>${e}</li>`).join("")}</ul>
+  `;
+}
+
+// skills tab
+async function renderSkillsDynamic() {
+  const content = document.getElementById("char-content");
+  content.innerHTML = "<p style='color:#888;'>Loading skills...</p>";
+
+  try {
+    const [skillsRes, charRes] = await Promise.all([
+      fetch("skills.json"),
+      fetch("character.json")
+    ]);
+    if (!skillsRes.ok || !charRes.ok) throw new Error("Failed to load skill or character data.");
+
+    const skillsList = await skillsRes.json();
+    const charData = await charRes.json();
+    const charSkills = charData.skills || {};
+
+    content.innerHTML = `
+      <h3 style="color:#ffcc00;">Skills</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem;">
+        <thead>
+          <tr style="border-bottom:1px solid #333;color:#ffcc00;">
+            <th style="text-align:left;">Skill</th>
+            <th>Ability</th>
+            <th>Ability Mod</th>
+            <th>Rank</th>
+            <th>Other</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${skillsList
+            .map(skill => {
+              const s = charSkills[skill.id] || { abilityMod: 0, rank: 0, misc: 0 };
+              const total = s.abilityMod + s.rank + s.misc;
+              return `
+                <tr>
+                  <td style="padding:4px 6px;">${skill.name}${skill.trainedOnly ? " *" : ""}</td>
+                  <td style="text-align:center;">${skill.ability}</td>
+                  <td style="text-align:center;color:#00bfff;">${s.abilityMod >= 0 ? "+" + s.abilityMod : s.abilityMod}</td>
+                  <td style="text-align:center;">${s.rank}</td>
+                  <td style="text-align:center;">${s.misc >= 0 ? "+" + s.misc : s.misc}</td>
+                  <td style="text-align:center;color:#ffcc00;font-weight:600;">${total >= 0 ? "+" + total : total}</td>
+                </tr>`;
+            })
+            .join("")}
+        </tbody>
+      </table>
+      <p style="font-size:0.8rem;color:#777;margin-top:0.5rem;">* trained-only skills require ranks to use</p>
+    `;
+  } catch (err) {
+    content.innerHTML = `<p style="color:#c00;">Error: ${err.message}</p>`;
+  }
+}
+
 // ==== LOAD SPELLS ====
 async function loadSpells() {
  try {
- const res = await fetch('data.json');
- if (!res.ok) throw new Error('Could not load data.json');
+ const res = await fetch('spellData.json');
+ if (!res.ok) throw new Error('Could not load spellData.json');
  const allData = await res.json();
  localStorage.setItem("allSpells", JSON.stringify(allData));
  const activeNames = JSON.parse(localStorage.getItem("activeSpells") || "[]");
@@ -504,8 +642,8 @@ async function openSpellManager() {
  listContainer.innerHTML = "Loading spells...";
  try {
  // Always load from file
- const res = await fetch('data.json');
- if (!res.ok) throw new Error('Could not load data.json');
+ const res = await fetch('spellData.json');
+ if (!res.ok) throw new Error('Could not load spellData.json');
  const allSpells = await res.json();
  const activeSpells = JSON.parse(localStorage.getItem("activeSpells") || "[]");
  renderSpellManager(allSpells, activeSpells);
@@ -600,7 +738,7 @@ function renderSpellManager(allSpells, activeSpells) {
  const selected = Array.from(listContainer.querySelectorAll("input[type=checkbox]:checked"))
  .map(cb => cb.dataset.name);
  localStorage.setItem("activeSpells", JSON.stringify(selected));
- const res = await fetch("data.json");
+ const res = await fetch("spellData.json");
  const allData = await res.json();
  localStorage.setItem("allSpells", JSON.stringify(allData));
  spells = allData.filter(s => selected.includes(s.name));
@@ -615,72 +753,46 @@ function renderSpellManager(allSpells, activeSpells) {
 // === GLOBAL TOOLTIP HANDLER ===
 let tooltipDiv = null;
 document.addEventListener("mouseover", e => {
- const row = e.target.closest(".spell-item-row");
- if (!row || !row.dataset.tooltip) return;
- if (!tooltipDiv) {
- tooltipDiv = document.createElement("div");
- tooltipDiv.style.position = "fixed";
- tooltipDiv.style.background = "rgba(20,20,20,0.95)";
- tooltipDiv.style.color = "#f1f1f1";
- tooltipDiv.style.border = "1px solid #555";
- tooltipDiv.style.borderRadius = "6px";
- tooltipDiv.style.padding = "0.6rem";
- tooltipDiv.style.fontSize = "0.85rem";
- tooltipDiv.style.lineHeight = "1.25";
- tooltipDiv.style.maxWidth = "320px";
- tooltipDiv.style.pointerEvents = "none";
- tooltipDiv.style.zIndex = "999999";
- tooltipDiv.style.boxShadow = "0 2px 10px rgba(0,0,0,0.6)";
- tooltipDiv.style.transition = "opacity 0.1s ease";
- document.body.appendChild(tooltipDiv);
- }
- tooltipDiv.textContent = row.dataset.tooltip;
- tooltipDiv.style.display = "block";
- tooltipDiv.style.opacity = "1";
- const moveTooltip = ev => {
- const padding = 12;
- let x = ev.clientX + padding;
- let y = ev.clientY + padding;
- const rect = tooltipDiv.getBoundingClientRect();
- // Prevent overflow to right and bottom
- if (x + rect.width > window.innerWidth - 5) x = ev.clientX - rect.width - padding;
- if (y + rect.height > window.innerHeight - 5) y = ev.clientY - rect.height - padding;
- tooltipDiv.style.left = `${x}px`;
- tooltipDiv.style.top = `${y}px`;
- };
- document.addEventListener("mousemove", moveTooltip);
- row.addEventListener("mouseleave", () => {
- tooltipDiv.style.display = "none";
- document.removeEventListener("mousemove", moveTooltip);
- }, { once: true });
-ntent = row.dataset.tooltip;
+  const row = e.target.closest(".spell-item-row");
+  if (!row || !row.dataset.tooltip) return;
+
+  if (!tooltipDiv) {
+    tooltipDiv = document.createElement("div");
+    tooltipDiv.style.position = "fixed";
+    tooltipDiv.style.background = "rgba(20,20,20,0.95)";
+    tooltipDiv.style.color = "#f1f1f1";
+    tooltipDiv.style.border = "1px solid #555";
+    tooltipDiv.style.borderRadius = "6px";
+    tooltipDiv.style.padding = "0.6rem";
+    tooltipDiv.style.fontSize = "0.85rem";
+    tooltipDiv.style.lineHeight = "1.25";
+    tooltipDiv.style.maxWidth = "320px";
+    tooltipDiv.style.pointerEvents = "none";
+    tooltipDiv.style.zIndex = "999999";
+    tooltipDiv.style.boxShadow = "0 2px 10px rgba(0,0,0,0.6)";
+    document.body.appendChild(tooltipDiv);
+  }
+
+  tooltipDiv.textContent = row.dataset.tooltip;
   tooltipDiv.style.display = "block";
   tooltipDiv.style.opacity = "1";
 
-  document.addEventListener("mousemove", moveTooltip);
-
-  row.addEventListener("mouseleave", () => {
-    tooltipDiv.style.display = "none";
-    document.removeEventListener("mousemove", moveTooltip);
-  }, { once: true });
-nt = row.dataset.tooltip;
-  tooltipDiv.style.display = "block";
-  tooltipDiv.style.opacity = "1";
-
-  document.addEventListener("mousemove", moveTooltip);
-
-  row.addEventListener("mouseleave", () => {
-    tooltipDiv.style.display = "none";
-    document.removeEventListener("mousemove", moveTooltip);
-  }, { once: true });
-ent = row.dataset.tooltip;
-  tooltipDiv.style.display = "block";
-  tooltipDiv.style.opacity = "1";
+  const moveTooltip = ev => {
+    const padding = 12;
+    let x = ev.clientX + padding;
+    let y = ev.clientY + padding;
+    const rect = tooltipDiv.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 5) x = ev.clientX - rect.width - padding;
+    if (y + rect.height > window.innerHeight - 5) y = ev.clientY - rect.height - padding;
+    tooltipDiv.style.left = `${x}px`;
+    tooltipDiv.style.top = `${y}px`;
+  };
 
   document.addEventListener("mousemove", moveTooltip);
-
   row.addEventListener("mouseleave", () => {
     tooltipDiv.style.display = "none";
     document.removeEventListener("mousemove", moveTooltip);
   }, { once: true });
 });
+
+document.getElementById("openSettingsButton").addEventListener("click", openSettings);
