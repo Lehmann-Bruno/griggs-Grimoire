@@ -24,12 +24,22 @@ function showNavbar(pageId) {
   spellNavbar.classList.remove("navbar-active");
   characterNavbar.classList.remove("navbar-active");
 
-  // add to the correct one
+  // hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  // add to the correct one and show its default page
   if (pageId === "magic") {
     spellNavbar.classList.add("navbar-active");
+    document.getElementById("spellbook").classList.add("active"); // default for Magic
   } else if (pageId === "character") {
     characterNavbar.classList.add("navbar-active");
+    document.getElementById("main").classList.add("active"); // default for Character Sheet
   }
+
+  // update navbar highlight
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const link = document.querySelector(`nav a[onclick*="${pageId}"]`);
+  if (link) link.classList.add('active');
 }
 
 function showPage(pageId) {
@@ -704,6 +714,32 @@ function renderSpellManager(allSpells, activeSpells) {
  row.style.borderBottom = "1px solid #333";
  row.style.cursor = "pointer";
  row.dataset.tooltip = spell.description || spell.shortdesc || "No description.";
+ // === Tooltip hover for Manage Spells modal ===
+  row.addEventListener("mouseenter", (e) => {
+    const tooltip = document.createElement("div");
+    tooltip.className = "tooltip-box";
+    tooltip.textContent = row.dataset.tooltip;
+    document.body.appendChild(tooltip);
+
+    const moveTooltip = (ev) => {
+      const offset = 15; // distance from cursor
+      tooltip.style.position = "fixed";
+      tooltip.style.left = `${ev.clientX + offset}px`;
+      tooltip.style.top = `${ev.clientY + offset}px`;
+    };
+
+    document.addEventListener("mousemove", moveTooltip);
+    row._tooltipEl = tooltip;
+    row._moveHandler = moveTooltip;
+  });
+
+  row.addEventListener("mouseleave", () => {
+    if (row._tooltipEl) row._tooltipEl.remove();
+    if (row._moveHandler) document.removeEventListener("mousemove", row._moveHandler);
+    row._tooltipEl = null;
+    row._moveHandler = null;
+  });
+
  const label = document.createElement("span");
  label.textContent = spell.name;
  label.style.flex = "1";
@@ -769,3 +805,39 @@ function clearSpellDetails() {
   if (!detail) return;
   detail.innerHTML = `<p class="placeholder">Hover over a spell to view its details.</p>`;
 }
+// === Close modals with ESC key ===
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const spellManager = document.getElementById("spellManagerModal");
+    const settingsModal = document.getElementById("settingsModal");
+
+    if (spellManager && spellManager.style.display === "flex") {
+      spellManager.style.display = "none";
+      console.log("Closed Manage Spells via ESC");
+    }
+
+    if (settingsModal && settingsModal.style.display === "flex") {
+      settingsModal.style.display = "none";
+      console.log("Closed Settings via ESC");
+    }
+  }
+});
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelector('nav a[onclick*="spellbook"]').classList.add("active");
+});
+document.addEventListener("DOMContentLoaded", () => {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  // Show only the spellbook by default
+  const spellbook = document.getElementById('spellbook');
+  if (spellbook) spellbook.classList.add('active');
+
+  // Make sure correct navbar is visible
+  const spellNavbar = document.getElementById('spell-navbar');
+  const characterNavbar = document.getElementById('character-navbar');
+  if (spellNavbar && characterNavbar) {
+    spellNavbar.classList.add('navbar-active');
+    characterNavbar.classList.remove('navbar-active');
+  }
+});

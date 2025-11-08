@@ -16,8 +16,9 @@
 
         <li class="nav-divider"></li>
 
-        <li id="nav-magic" class="nav-pages"><a href="#" onclick="showNavbar('magic')">Magic</a></li>
-        <li id="nav-character"class="nav-pages"><a href="#" onclick="showNavbar('character')">Character Sheet</a></li>
+        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic')">Magic</a></li>
+        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character')">Character Sheet</a></li>
+
     </ul>
   </nav>
 
@@ -32,21 +33,10 @@
 
         <li class="nav-divider"></li>
 
-        <li id="nav-magic" class="nav-pages"><a href="#" onclick="showNavbar('magic')">Magic</a></li>
-        <li id="nav-character"class="nav-pages"><a href="#" onclick="showNavbar('character')">Character Sheet</a></li>
+        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic')">Magic</a></li>
+        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character')">Character Sheet</a></li>
     </ul>
   </nav>
-
-<!-- ... keep your spellbook/cast/etc ... -->
-
-  <div id="magic" class="page">aloaloalo</div>
-  <div id="main" class="page">aloaloalo</div>
-
-  <div id="character" class="page">
-    <h2>Character Sheet</h2>
-    <p>This is where your character’s details, skills, feats, and equipment will go.</p>
-    <div id="character-buttons" class="button-container"></div>
-  </div>
 
   <div id="spellbook" class="page active">
     <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
@@ -59,7 +49,6 @@
   <div id="cast" class="page">
     <div class="cast-layout">
       <div class="cast-list">
-        <h2>Cast Spells</h2>
         <div id="checkedList"></div>
       </div>
 
@@ -71,13 +60,6 @@
     </div>
   </div>
 
-  <div id="placeholder" class="page">
-    <h2>Placeholder Page</h2>
-    <p>This is your new section.</p>
-    <div id="placeholder-buttons" class="button-container">
-    </div>
-  </div>
-  
   <div id="settingsModal" class="modal">
     <div class="modal-content">
       <h2>Spell & Cast Settings</h2>
@@ -104,7 +86,6 @@
           <option value="transmutation">Transmutation</option>
         </select>
       </div>
-
 
       <form id="settingsForm"></form>
 
@@ -145,6 +126,45 @@
         <button id="closeSpellManager" type="button">Close</button>
       </div>
     </div>
+  </div>
+
+  <div id="main" class="page">
+    <form id="characterForm" class="character-form">
+      <div class="char-field">
+        <label>Character Name</label>
+        <input type="text" id="charName">
+      </div>
+
+      <div class="char-field">
+        <label>Player</label>
+        <input type="text" id="charPlayer">
+      </div>
+
+      <div class="char-field">
+        <label>Class</label>
+        <input type="text" id="charClass">
+      </div>
+
+      <div class="char-field small">
+        <label>Level</label>
+        <input type="number" id="charLevel" min="1" max="20" value="1">
+      </div>
+
+      <div class="char-field small">
+        <label>Race</label>
+        <input type="text" id="charRace">
+      </div>
+
+      <div class="char-field small">
+        <label>Alignment</label>
+        <input type="text" id="charAlignment">
+      </div>
+
+      <div class="char-field small">
+        <label>Deity</label>
+        <input type="text" id="charDeity">
+      </div>
+    </form>
   </div>
 
   <script src="script.js"></script>

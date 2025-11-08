@@ -577,7 +577,7 @@ nav a:hover {
   background: #181818;
   border: 1px solid #333;
   border-radius: 8px;
-  min-height: 70vh;
+  min-height: 85vh;
   padding: 1rem;
   color: #666;
   text-align: center;
@@ -607,4 +607,90 @@ nav a:hover {
 .spell-detail .placeholder {
   font-style: italic;
   color: #777;
+}
+.tooltip-box {
+  background: #222;
+  color: #f5f5f5;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  max-width: 340px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  position: fixed;
+  z-index: 9999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+nav a.active {
+  color: #ffcc00;
+}
+#character-navbar.navbar-active .page {
+  color: #00bfff;
+}
+#spell-navbar.navbar-active a[onclick*="showNavbar('magic')"] {
+  color: #ffcc00;
+  text-shadow: 0 0 8px #ffcc00, 0 0 16px rgba(255, 204, 0, 0.5);
+  font-weight: bold;
+}
+
+#character-navbar.navbar-active a[onclick*="showNavbar('character')"] {
+  color: #00bfff;
+  text-shadow: 0 0 8px #00bfff, 0 0 16px rgba(255, 204, 0, 0.5);
+  font-weight: bold;
+}
+#character-navbar.navbar-active a.active {
+  color: #00bfff;
+}
+/* === CHARACTER SHEET HEADER === */
+.character-form {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.char-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 100px;
+}
+
+.char-field.small {
+  flex: 0.5;
+  max-width: 120px;
+}
+
+.char-field label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  margin-bottom: 0.2rem;
+}
+
+.char-field input {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #666;
+  color: #f1f1f1;
+  padding: 0.3rem 0;
+  font-size: 0.95rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.char-field input:focus {
+  border-bottom: 1px solid #00bfff;
+}
+/* Remove number input arrows (spinner) */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
