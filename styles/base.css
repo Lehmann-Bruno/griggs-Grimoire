@@ -1,0 +1,29 @@
+/* === BASE === */
+:root {
+  --bg-dark: #111;
+  --bg-panel: #1b1b1b;
+  --text-main: #f1f1f1;
+  --accent-gold: #ffcc00;
+  --accent-blue: #00bfff;
+  --border: #333;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  margin: 0;
+}
+
+h1, h2, h3 {
+  color: var(--accent-gold);
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}

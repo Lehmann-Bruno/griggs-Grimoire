@@ -1,0 +1,63 @@
+/* === COMPONENTS === */
+
+/* Buttons */
+button {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: .6rem .8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .25s;
+}
+button:hover {
+  background: #555;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="number"] {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-main);
+  padding: 0.3rem 0.4rem;
+  font-size: 0.95rem;
+}
+input:focus {
+  outline: 1px solid var(--accent-blue);
+}
+
+/* Modals */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,.7);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 620px;
+  color: var(--text-main);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.modal-actions button {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+}

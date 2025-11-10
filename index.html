@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Grimório de Griggs</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
   <nav id="spell-navbar" class="navbar-active">
@@ -16,8 +16,8 @@
 
         <li class="nav-divider"></li>
 
-        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic')">Magic</a></li>
-        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character')">Character Sheet</a></li>
+        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic'),showPage('spellbook')">Magic</a></li>
+        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character'),showPage('main')">Character Sheet</a></li>
 
     </ul>
   </nav>
@@ -33,16 +33,18 @@
 
         <li class="nav-divider"></li>
 
-        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic')">Magic</a></li>
-        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character')">Character Sheet</a></li>
+        <li id="nav-magic" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('magic'),showPage('spellbook')">Magic</a></li>
+        <li id="nav-character" class="nav-pages"><a href="#" class="navbar-switch" onclick="showNavbar('character'),showPage('main')">Character Sheet</a></li>
     </ul>
   </nav>
 
   <div id="spellbook" class="page active">
-    <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
-        Unprepare All Spells
-    </button>
-    <input id="search" type="text" placeholder="Search spells...">
+    <div class="spellbook-buttons">
+      <input id="search" type="text" placeholder="Search spells...">
+      <button id="clearAllButton" class="rest-button" style="background:#800000;margin-bottom:1rem;">
+          Unprepare All Spells
+      </button>
+    </div>
     <div id="spells">Loading...</div>
   </div>
 
@@ -165,8 +167,84 @@
         <input type="text" id="charDeity">
       </div>
     </form>
+  <div class="hp-section">
+    <label for="currentHP">Hit Points</label>
+    <div class="hp-bar-container">
+      <div id="hp-bar" class="hp-bar"></div>
+    </div>
+    <div class="hp-values">
+      <input type="number" id="currentHP" value="35" min="0">
+      <span>/</span>
+      <input type="number" id="maxHP" value="50" min="1">
+    </div>
   </div>
 
+  <div class="attributes-section">
+    <div class="attribute-box">
+      <label>Strength</label>
+      <input type="number" id="str" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="str-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+    <div class="attribute-box">
+      <label>Dexterity</label>
+      <input type="number" id="dex" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="dex-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+    <div class="attribute-box">
+      <label>Constitution</label>
+      <input type="number" id="con" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="con-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+    <div class="attribute-box">
+      <label>Intelligence</label>
+      <input type="number" id="int" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="int-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+    <div class="attribute-box">
+      <label>Wisdom</label>
+      <input type="number" id="wis" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="wis-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+    <div class="attribute-box">
+      <label>Charisma</label>
+      <input type="number" id="cha" class="attr-input" min="1" max="30" value="10">
+      <input type="text" id="cha-mod" class="mod-input" readonly placeholder="+0">
+    </div>
+  </div>
+  <div class="saving-throws-section">
+    <h3>Saving Throws</h3>
+
+    <div class="saving-throw" data-type="fortitude">
+      <label>Fortitude</label><a>(constitution)</a>
+      <div class="saving-inputs">
+        <input type="number" id="fort-attr" class="save-input" placeholder="Attr" readonly>
+        <input type="number" id="fort-base" class="save-input" placeholder="Base">
+        <input type="number" id="fort-custom" class="save-input" placeholder="Custom">
+        <span class="save-total" id="fort-total">+0</span>
+      </div>
+    </div>
+
+    <div class="saving-throw" data-type="reflex">
+      <label>Reflex</label><a>(Dexterity)</a>
+      <div class="saving-inputs">
+        <input type="number" id="ref-attr" class="save-input" placeholder="Attr" readonly>
+        <input type="number" id="ref-base" class="save-input" placeholder="Base">
+        <input type="number" id="ref-custom" class="save-input" placeholder="Custom">
+        <span class="save-total" id="ref-total">+0</span>
+      </div>
+    </div>
+
+    <div class="saving-throw" data-type="will">
+      <label>Will</label><a>(Wisdom)</a>
+      <div class="saving-inputs">
+        <input type="number" id="will-attr" class="save-input" placeholder="Attr" readonly>
+        <input type="number" id="will-base" class="save-input" placeholder="Base">
+        <input type="number" id="will-custom" class="save-input" placeholder="Custom">
+        <span class="save-total" id="will-total">+0</span>
+      </div>
+    </div>
+  </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
