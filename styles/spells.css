@@ -1,0 +1,202 @@
+/* === SPELLBOOK & CAST === */
+
+.level-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.spell-card {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  align-self: flex-start;
+}
+
+.spell-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,.6);
+}
+
+.spell-content {
+  display: none;
+  margin-top: 0.6rem;
+  background: #222;
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  border: 1px solid #333;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+  overflow: hidden;
+}
+
+.cast-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.cast-list {
+  flex: 2;
+  min-width: 60%;
+}
+
+.cast-right {
+  flex: 1;
+  min-width: 30%;
+  background: #181818;
+  border: 1px solid #333;
+  border-radius: 8px;
+  min-height: 85vh;
+  padding: 1rem;
+  color: #666;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spell-detail {
+  white-space: pre-line;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #f8f8f8;
+}
+
+.spell-detail strong {
+  color: #fff;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+
+.normal-text { color: #ffcc00; font-weight: 600; }
+.special-text { color: #00bfff; font-weight: 600; }
+
+.slot-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.normal-container,
+.specialist-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.normal-label,
+.specialist-label {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.add-normal-btn,
+.add-specialist-btn {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.add-normal-btn:hover { background: #555; }
+.add-specialist-btn:hover { background: #007acc; }
+
+.normal-count,
+.specialist-count {
+  min-width: 1.5rem;
+  text-align: right;
+  font-weight: bold;
+  color: #ccc;
+}
+
+.cast-button {
+  flex-shrink: 0;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: .25rem .6rem;
+  font-size: .8rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background .2s ease, transform .1s ease;
+  margin-left: auto;
+  width: auto;
+}
+.cast-button:hover { background: #666; transform: translateY(-1px); }
+
+#castsPerDayContainer,
+.cast-level-title {
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: .6rem 1rem;
+}
+
+#castsPerDayContainer li,
+.cast-level-title strong { color: #ddd; font-size: .95rem; }
+
+.cast-level-title {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .4rem .8rem;
+  margin-top: .6rem;
+}
+.cast-level-title .cast-count { color: #00bfff; font-weight: 500; font-size: .9rem; }
+
+.spell-list-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px;
+}
+.spell-list-item.normal:hover {
+  background-color: rgba(255, 255, 100, 0.2);
+  box-shadow: 0 0 6px rgba(255, 255, 100, 0.4);
+}
+.spell-list-item.specialist:hover {
+  background-color: rgba(0, 180, 255, 0.2);
+  box-shadow: 0 0 6px rgba(0, 180, 255, 0.4);
+}
+.spellbook-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+#clearAllButton {
+    margin-bottom: 0px !important;
+}
+.spellbook-buttons {
+    margin-bottom: 2rem;
+}
+.dual-column {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: nowrap; /* ensures side-by-side instead of stacking */
+  width: 100%;
+}
+#saveSettings { background: #006400; color: #fff; }
+#saveSettings:hover { background: #008000; }
+#closeSettings { background: #444; color: #fff; }
+#closeSettings:hover { background: #666; }
+#isSpecialist { accent-color: #ffcc00; }
+#isHighSpecialist { accent-color: #00bfff; }

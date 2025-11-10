@@ -20,27 +20,23 @@ function showNavbar(pageId) {
   const spellNavbar = document.getElementById("spell-navbar");
   const characterNavbar = document.getElementById("character-navbar");
 
-  // remove active class from both
+  // hide both navbars first
   spellNavbar.classList.remove("navbar-active");
   characterNavbar.classList.remove("navbar-active");
 
   // hide all pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
-  // add to the correct one and show its default page
+  // show correct navbar + its default page
   if (pageId === "magic") {
     spellNavbar.classList.add("navbar-active");
-    document.getElementById("spellbook").classList.add("active"); // default for Magic
+    document.getElementById("spellbook").classList.add("active");
   } else if (pageId === "character") {
     characterNavbar.classList.add("navbar-active");
-    document.getElementById("main").classList.add("active"); // default for Character Sheet
+    document.getElementById("main").classList.add("active");
   }
-
-  // update navbar highlight
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  const link = document.querySelector(`nav a[onclick*="${pageId}"]`);
-  if (link) link.classList.add('active');
 }
+
 
 function showPage(pageId) {
   // Hide all pages
@@ -52,12 +48,20 @@ function showPage(pageId) {
 
   // === ACTIVE NAV LINK ===
   document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  const link = document.querySelector(`nav a[onclick*="${pageId}"]`);
+
+  // Try to find link by pageId inside onclick, even if combined with commas or spaces
+  const link =
+    document.querySelector(`#nav-${pageId} a`) ||
+    Array.from(document.querySelectorAll('nav a')).find(a =>
+      a.getAttribute('onclick')?.includes(`'${pageId}'`)
+    );
+
   if (link) link.classList.add('active');
 
   // === SPECIAL PAGE ACTIONS ===
   if (pageId === 'cast') renderChecked();
 }
+
 
 // ==== CLEAR ALL PREPARED SPELLS ====
 document.getElementById("clearAllButton").addEventListener("click", () => {
@@ -840,4 +844,183 @@ document.addEventListener("DOMContentLoaded", () => {
     spellNavbar.classList.add('navbar-active');
     characterNavbar.classList.remove('navbar-active');
   }
+});
+// === FULL CHARACTER SHEET LOCAL STORAGE SYSTEM ===
+
+// --- Calculate D&D-style modifier ---
+function calculateModifier(score) {
+  return Math.floor((score - 10) / 2);
+}
+
+// --- Update all modifier boxes based on current attributes ---
+function updateModifiers() {
+  const attrs = ["str", "dex", "con", "int", "wis", "cha"];
+  attrs.forEach(attr => {
+    const input = document.getElementById(attr);
+    const value = parseInt(input.value) || 0;
+    const mod = calculateModifier(value);
+    const modElem = document.getElementById(`${attr}-mod`);
+    if (modElem) modElem.value = mod >= 0 ? `+${mod}` : `${mod}`;
+  });
+}
+
+// --- Update HP bar visually ---
+function updateHPBar() {
+  const current = parseInt(document.getElementById("currentHP").value) || 0;
+  const max = parseInt(document.getElementById("maxHP").value) || 1;
+  const percent = Math.max(0, Math.min(100, (current / max) * 100));
+
+  const bar = document.getElementById("hp-bar");
+  bar.style.width = percent + "%";
+
+  // Color feedback
+  bar.classList.remove("low", "mid", "high");
+  if (percent < 30) bar.classList.add("low");
+  else if (percent < 70) bar.classList.add("mid");
+  else bar.classList.add("high");
+}
+
+// --- Save all character data to localStorage ---
+function saveCharacterData() {
+  const data = {
+    // Header form fields
+    name: document.getElementById("charName").value || "",
+    player: document.getElementById("charPlayer").value || "",
+    class: document.getElementById("charClass").value || "",
+    level: parseInt(document.getElementById("charLevel").value) || 1,
+    race: document.getElementById("charRace").value || "",
+    alignment: document.getElementById("charAlignment").value || "",
+    deity: document.getElementById("charDeity").value || "",
+
+    // Attributes
+    str: parseInt(document.getElementById("str").value) || 10,
+    dex: parseInt(document.getElementById("dex").value) || 10,
+    con: parseInt(document.getElementById("con").value) || 10,
+    int: parseInt(document.getElementById("int").value) || 10,
+    wis: parseInt(document.getElementById("wis").value) || 10,
+    cha: parseInt(document.getElementById("cha").value) || 10,
+
+    // HP
+    currentHP: parseInt(document.getElementById("currentHP").value) || 0,
+    maxHP: parseInt(document.getElementById("maxHP").value) || 1,
+  };
+
+  localStorage.setItem("characterData", JSON.stringify(data));
+}
+
+// --- Load character data from localStorage ---
+function loadCharacterData() {
+  const stored = JSON.parse(localStorage.getItem("characterData"));
+  if (!stored) return;
+
+  // Basic fields
+  if (stored.name) document.getElementById("charName").value = stored.name;
+  if (stored.player) document.getElementById("charPlayer").value = stored.player;
+  if (stored.class) document.getElementById("charClass").value = stored.class;
+  if (stored.level) document.getElementById("charLevel").value = stored.level;
+  if (stored.race) document.getElementById("charRace").value = stored.race;
+  if (stored.alignment) document.getElementById("charAlignment").value = stored.alignment;
+  if (stored.deity) document.getElementById("charDeity").value = stored.deity;
+
+  // Attributes
+  const attrs = ["str", "dex", "con", "int", "wis", "cha"];
+  attrs.forEach(attr => {
+    if (stored[attr] !== undefined) {
+      document.getElementById(attr).value = stored[attr];
+    }
+  });
+
+  // HP
+  if (stored.currentHP !== undefined)
+    document.getElementById("currentHP").value = stored.currentHP;
+  if (stored.maxHP !== undefined)
+    document.getElementById("maxHP").value = stored.maxHP;
+
+  updateModifiers();
+  updateHPBar();
+}
+
+// --- Unified input listener for autosave ---
+document.addEventListener("input", (e) => {
+  const id = e.target.id;
+
+  // HP or attribute update
+  if (["currentHP", "maxHP"].includes(id)) {
+    updateHPBar();
+  }
+  if (e.target.classList.contains("attr-input")) {
+    updateModifiers();
+  }
+
+  // Save everything on any input change
+  saveCharacterData();
+});
+
+// --- Initialize everything on load ---
+window.addEventListener("DOMContentLoaded", () => {
+  loadCharacterData();
+  updateModifiers();
+  updateHPBar();
+});
+// === SAVING THROWS SYSTEM ===
+// Fortitude = CON mod | Reflex = DEX mod | Will = WIS mod
+
+function calculateSavingThrows() {
+  const data = JSON.parse(localStorage.getItem("characterData")) || {};
+
+  const saves = [
+    { key: "fort", attr: "con" },
+    { key: "ref", attr: "dex" },
+    { key: "will", attr: "wis" }
+  ];
+
+  saves.forEach(save => {
+    const attrScore = parseInt(document.getElementById(save.attr)?.value) || 10;
+    const attrMod = Math.floor((attrScore - 10) / 2);
+    const base = parseInt(document.getElementById(`${save.key}-base`).value) || 0;
+    const custom = parseInt(document.getElementById(`${save.key}-custom`).value) || 0;
+
+    const total = attrMod + base + custom;
+
+    document.getElementById(`${save.key}-attr`).value = attrMod;
+    document.getElementById(`${save.key}-total`).textContent = total >= 0 ? `+${total}` : `${total}`;
+
+    // Save values
+    data[`${save.key}-base`] = base;
+    data[`${save.key}-custom`] = custom;
+  });
+
+  localStorage.setItem("characterData", JSON.stringify(data));
+}
+
+// --- Hook saving throws updates ---
+document.addEventListener("input", (e) => {
+  const id = e.target.id;
+  if (id && (id.includes("-base") || id.includes("-custom"))) {
+    calculateSavingThrows();
+  }
+});
+
+// --- Update when attributes change ---
+function updateAllSaves() {
+  updateModifiers();
+  calculateSavingThrows();
+}
+
+// --- Load stored saves on start ---
+function loadSavingThrows() {
+  const stored = JSON.parse(localStorage.getItem("characterData")) || {};
+  const saves = ["fort", "ref", "will"];
+  saves.forEach(save => {
+    if (stored[`${save}-base`] !== undefined)
+      document.getElementById(`${save}-base`).value = stored[`${save}-base`];
+    if (stored[`${save}-custom`] !== undefined)
+      document.getElementById(`${save}-custom`).value = stored[`${save}-custom`];
+  });
+  calculateSavingThrows();
+}
+
+// Add to startup
+window.addEventListener("DOMContentLoaded", () => {
+  loadSavingThrows();
 });
