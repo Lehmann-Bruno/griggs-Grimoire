@@ -179,3 +179,86 @@
   font-size: 1rem;
   color: var(--accent-blue);
 }
+
+input[type=number] {
+  appearance: textfield;
+}
+/* ===== SKILLS PAGE ===== */
+.skills-table {
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1rem;
+  width: 95%;
+  margin: 1.5rem auto;
+  color: #f1f1f1;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Two-column layout for the skills list */
+.skills-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
+}
+
+/* Each column acts like its own mini-table */
+.skills-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Common row style */
+.skill-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 60px 90px 60px 60px;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.skills-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 60px 90px 60px 60px;
+  font-weight: bold;
+  color: #ffcc00;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.3rem;
+}
+
+/* Inputs & dropdowns */
+.skill-row input[type="number"],
+.skill-row select,
+.skill-row input[type="text"] {
+  background: #222;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 4px;
+  text-align: left;
+  padding: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.skill-row input.skill-total {
+  background: #111;
+  color: #00bfff;
+  font-weight: bold;
+}
+
+.skill-row input[type="checkbox"] {
+  transform: scale(1.1);
+  accent-color: #ffcc00;
+  cursor: pointer;
+}
+.skills-header,
+.skill-row {
+  display: grid;
+  grid-template-columns: 50px 180px 70px 90px 70px 70px;
+  align-items: center;
+  gap: 0.4rem;
+}

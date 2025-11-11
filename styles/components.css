@@ -35,7 +35,6 @@ input:focus {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 2000;
   background: rgba(0,0,0,.7);
   justify-content: center;
   align-items: center;
@@ -49,6 +48,7 @@ input:focus {
   max-width: 620px;
   color: var(--text-main);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  max-height: 95vh;
 }
 .modal-actions {
   margin-top: 1rem;
@@ -60,4 +60,18 @@ input:focus {
   padding: 0.5rem 1.2rem;
   font-size: 0.95rem;
   border-radius: 6px;
+}
+
+#spellManagerList {
+  max-height: 40vh;
+}
+.tooltip-box {
+  background: #222;
+  color: #f5f5f5;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  position: fixed;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  max-width: 700px;
 }

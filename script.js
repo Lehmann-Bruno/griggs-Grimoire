@@ -16,6 +16,55 @@ function countPreparedByLevel(list) {
  return counts;
 }
 
+
+window.addEventListener("DOMContentLoaded", () => {
+  const spellNavbar = document.getElementById('spell-navbar');
+  const characterNavbar = document.getElementById('character-navbar');
+  const spellbook = document.getElementById('spellbook');
+  const skillsContainer = document.getElementById("skills-container");
+  document.querySelector('nav a[onclick*="spellbook"]').classList.add("active");
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (spellbook) spellbook.classList.add('active');
+
+  loadCharacterData();
+  updateModifiers();
+  updateHPBar();
+  loadSavingThrows();
+  renderSkills();
+  loadSkillsFromLocalStorage();
+  updateSkillTotals();
+
+  skillsContainer.addEventListener("input", (e) => {
+    if (
+      e.target.classList.contains("skill-ranks") ||
+      e.target.classList.contains("skill-misc") ||
+      e.target.classList.contains("skill-ability")
+    ) {
+      updateSkillTotals();
+      saveSkillsToLocalStorage();
+    }
+  });
+
+  skillsContainer.addEventListener("change", (e) => {
+    if (e.target.classList.contains("trained")) {
+      updateSkillTotals();
+      saveSkillsToLocalStorage();
+    }
+  });
+
+  if (spellNavbar && characterNavbar) {
+    spellNavbar.classList.add('navbar-active');
+    characterNavbar.classList.remove('navbar-active');
+  }
+  
+  // auto-save on any change
+  document.getElementById("skills-container").addEventListener("input", () => {
+    saveSkillsToLocalStorage();
+  });
+
+  
+});
+
 function showNavbar(pageId) {
   const spellNavbar = document.getElementById("spell-navbar");
   const characterNavbar = document.getElementById("character-navbar");
@@ -532,6 +581,11 @@ loadSpells();
 function openSettings() {
   const modal = document.getElementById("settingsModal");
   const form = document.getElementById("settingsForm");
+
+  if (modal.style.display === "flex") {
+    closeSettings();
+    return;
+  }
   modal.style.display = "flex";
 
   const savedSlots = JSON.parse(localStorage.getItem("spellSlotsCustom")) || spellSlots;
@@ -570,6 +624,10 @@ function openSettings() {
   </div>`;
   form.innerHTML = html;
 
+}
+function closeSettings() {
+  const modal = document.getElementById("settingsModal");
+  modal.style.display = "none";
 }
 
 // === Checkbox Logic ===
@@ -622,7 +680,6 @@ document.getElementById("saveSettings").addEventListener("click", () => {
   updateCounters();
   if (spells && spells.length > 0) renderSpells(spells);
 
-  // ✅ FIX HERE
   document.getElementById("settingsModal").style.display = "none";
 });
 
@@ -651,6 +708,12 @@ document.getElementById("saveSettings").addEventListener("click", () => {
 // ==== SPELL MANAGER ====
 async function openSpellManager() {
  const modal = document.getElementById("spellManagerModal");
+
+ if (modal.style.display === "flex") {
+  closeSpellManager();
+  return;
+ }
+
  modal.style.display = "flex";
  const listContainer = document.getElementById("spellManagerList");
  listContainer.innerHTML = "Loading spells...";
@@ -665,6 +728,12 @@ async function openSpellManager() {
  listContainer.textContent = err.message;
  }
 }
+
+function closeSpellManager() {
+  const modal = document.getElementById("spellManagerModal");
+  modal.style.display = "none";
+}
+
 function renderSpellManager(allSpells, activeSpells) {
  const listContainer = document.getElementById("spellManagerList");
  const searchInput = document.getElementById("spellSearchManager");
@@ -826,25 +895,6 @@ document.addEventListener("keydown", (e) => {
     }
   }
 });
-window.addEventListener("DOMContentLoaded", () => {
-  document.querySelector('nav a[onclick*="spellbook"]').classList.add("active");
-});
-document.addEventListener("DOMContentLoaded", () => {
-  // Hide all pages
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
-  // Show only the spellbook by default
-  const spellbook = document.getElementById('spellbook');
-  if (spellbook) spellbook.classList.add('active');
-
-  // Make sure correct navbar is visible
-  const spellNavbar = document.getElementById('spell-navbar');
-  const characterNavbar = document.getElementById('character-navbar');
-  if (spellNavbar && characterNavbar) {
-    spellNavbar.classList.add('navbar-active');
-    characterNavbar.classList.remove('navbar-active');
-  }
-});
 // === FULL CHARACTER SHEET LOCAL STORAGE SYSTEM ===
 
 // --- Calculate D&D-style modifier ---
@@ -950,18 +1000,14 @@ document.addEventListener("input", (e) => {
   }
   if (e.target.classList.contains("attr-input")) {
     updateModifiers();
+    updateAllSaves();
+    updateSkillTotals();
   }
 
   // Save everything on any input change
   saveCharacterData();
 });
 
-// --- Initialize everything on load ---
-window.addEventListener("DOMContentLoaded", () => {
-  loadCharacterData();
-  updateModifiers();
-  updateHPBar();
-});
 // === SAVING THROWS SYSTEM ===
 // Fortitude = CON mod | Reflex = DEX mod | Will = WIS mod
 
@@ -1020,7 +1066,265 @@ function loadSavingThrows() {
   calculateSavingThrows();
 }
 
-// Add to startup
-window.addEventListener("DOMContentLoaded", () => {
-  loadSavingThrows();
+document.getElementById("printStorageButton").addEventListener("click", () => {
+  const filteredData = {};
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+
+    // Skip full spell database
+    if (key.toLowerCase().includes("allspells")) continue;
+
+    try {
+      const parsed = JSON.parse(value);
+
+      // If it’s an array of spells, keep only their names
+      if (Array.isArray(parsed) && parsed.length && typeof parsed[0] === "object" && parsed[0].name) {
+        filteredData[key] = parsed.map(spell => spell.name);
+      }
+      // If it’s a prepared spell list or other simple data
+      else if (Array.isArray(parsed)) {
+        filteredData[key] = parsed;
+      } else {
+        filteredData[key] = parsed;
+      }
+    } catch {
+      filteredData[key] = value;
+    }
+  }
+
+  console.log("=== LocalStorage (active & prepared spells only) ===");
+  console.log(JSON.stringify(filteredData, null, 2));
+});
+const skills = [
+  { name: "Appraise", ability: "int" },
+  { name: "Balance", ability: "dex" },
+  { name: "Bluff", ability: "cha" },
+  { name: "Climb", ability: "str" },
+  { name: "Concentration", ability: "con" },
+
+  { name: "Craft1", display: "Craft", ability: "int", multi: true },
+  { name: "Craft2", display: "Craft", ability: "int", multi: true },
+
+  { name: "Decipher Script", ability: "int" },
+  { name: "Diplomacy", ability: "cha" },
+  { name: "Disable Device", ability: "int" },
+  { name: "Disguise", ability: "cha" },
+  { name: "Escape Artist", ability: "dex" },
+  { name: "Forgery", ability: "int" },
+  { name: "Gather Information", ability: "cha" },
+  { name: "Handle Animal", ability: "cha" },
+  { name: "Heal", ability: "wis" },
+  { name: "Hide", ability: "dex" },
+  { name: "Intimidate", ability: "cha" },
+  { name: "Jump", ability: "str" },
+
+  { name: "Knowledge1", display: "Knowledge", ability: "int", multi: true },
+  { name: "Knowledge2", display: "Knowledge", ability: "int", multi: true },
+  { name: "Knowledge3", display: "Knowledge", ability: "int", multi: true },
+  { name: "Knowledge4", display: "Knowledge", ability: "int", multi: true },
+  { name: "Knowledge5", display: "Knowledge", ability: "int", multi: true },
+
+  { name: "Listen", ability: "wis" },
+  { name: "Move Silently", ability: "dex" },
+  { name: "Open Lock", ability: "dex" },
+  
+  { name: "Perform1", display: "Perform", ability: "cha", multi: true },
+  { name: "Profession1", display: "Profession", ability: "wis", multi: true },
+
+  { name: "Ride", ability: "dex" },
+  { name: "Search", ability: "int" },
+  { name: "Sense Motive", ability: "wis" },
+  { name: "Sleight of Hand", ability: "dex" },
+  { name: "Spellcraft", ability: "int" },
+  { name: "Spot", ability: "wis" },
+  { name: "Survival", ability: "wis" },
+  { name: "Swim", ability: "str" },
+  { name: "Tumble", ability: "dex" },
+  { name: "Use Magic Device", ability: "cha" },
+  { name: "Use Rope", ability: "dex" }
+];
+
+function renderSkills() {
+  const container = document.getElementById("skills-container");
+  container.innerHTML = `
+    <div class="skills-header">
+      <span></span>
+      <span>Skill</span>
+      <span>Total</span>
+      <span>Ability</span>
+      <span>Ranks</span>
+      <span>Misc</span>
+    </div>
+    <div class="skills-list">
+      <div class="skills-column" id="col1"></div>
+      <div class="skills-column" id="col2"></div>
+    </div>
+  `;
+
+  const mid = Math.ceil(skills.length / 2);
+  const col1 = document.getElementById("col1");
+  const col2 = document.getElementById("col2");
+
+  skills.forEach((skill, i) => {
+    const row = document.createElement("div");
+    row.className = "skill-row";
+    row.dataset.skill = skill.name;
+
+    const labelOrInput = skill.multi
+      ? `<input type="text" class="skill-custom" placeholder="${skill.display || skill.name} Type">`
+      : `<label>${skill.display || skill.name}</label>`;
+
+    row.innerHTML = `
+      <input type="checkbox" class="trained">
+      ${labelOrInput}
+      <input type="number" class="skill-total" placeholder="0" readonly>
+      <select class="skill-ability">
+        <option value="str" ${skill.ability === "str" ? "selected" : ""}>STR</option>
+        <option value="dex" ${skill.ability === "dex" ? "selected" : ""}>DEX</option>
+        <option value="con" ${skill.ability === "con" ? "selected" : ""}>CON</option>
+        <option value="int" ${skill.ability === "int" ? "selected" : ""}>INT</option>
+        <option value="wis" ${skill.ability === "wis" ? "selected" : ""}>WIS</option>
+        <option value="cha" ${skill.ability === "cha" ? "selected" : ""}>CHA</option>
+      </select>
+      <input type="number" class="skill-ranks" placeholder="0">
+      <input type="number" class="skill-misc" placeholder="0">
+    `;
+
+    (i < mid ? col1 : col2).appendChild(row);
+  });
+}
+function saveSkillsToLocalStorage() {
+  const skillsData = [];
+
+  document.querySelectorAll('.skill-row').forEach(row => {
+    const skill = {
+      name: row.dataset.skill,
+      trained: row.querySelector('.trained').checked,
+      ability: row.querySelector('.skill-ability').value,
+      total: row.querySelector('.skill-total').value,
+      ranks: row.querySelector('.skill-ranks').value,
+      misc: row.querySelector('.skill-misc').value,
+    };
+
+    // custom skill input (like "Arcana" or "Jewelry")
+    const custom = row.querySelector('.skill-custom');
+    if (custom) skill.customName = custom.value;
+
+    skillsData.push(skill);
+  });
+
+  localStorage.setItem('skills', JSON.stringify(skillsData));
+}
+function loadSkillsFromLocalStorage() {
+  const saved = JSON.parse(localStorage.getItem('skills') || '[]');
+
+  saved.forEach(skill => {
+    const row = [...document.querySelectorAll('.skill-row')].find(r => r.dataset.skill === skill.name);
+    if (!row) return;
+
+    row.querySelector('.trained').checked = !!skill.trained;
+    row.querySelector('.skill-ability').value = skill.ability || 'int';
+    row.querySelector('.skill-total').value = skill.total || 0;
+    row.querySelector('.skill-ranks').value = skill.ranks || 0;
+    row.querySelector('.skill-misc').value = skill.misc || 0;
+
+    const custom = row.querySelector('.skill-custom');
+    if (custom && skill.customName) custom.value = skill.customName;
+  });
+
+}
+
+// === VALIDATE RANK LIMITS ===
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("skill-ranks")) {
+    const charData = JSON.parse(localStorage.getItem("characterData")) || {};
+    const charLevel = parseInt(charData.level) || 1;
+    const maxRanks = charLevel + 3;
+
+    const value = parseInt(e.target.value) || 0;
+    if (value > maxRanks) {
+      alert(`You cannot assign more than ${maxRanks} ranks (character level ${charLevel} + 3).`);
+      e.target.value = maxRanks;
+    }
+
+    // Save immediately after validation
+    saveSkillsToLocalStorage();
+  }
+});
+// === CALCULATE AND UPDATE SKILL TOTALS ===
+// === CALCULATE AND UPDATE SKILL TOTALS ===
+function updateSkillTotals() {
+  const charData = JSON.parse(localStorage.getItem("characterData") || "{}");
+
+  const getMod = (score) => {
+    const s = parseInt(score);
+    const val = Number.isNaN(s) ? 10 : s;
+    return Math.floor((val - 10) / 2);
+  };
+
+  const modifiers = {
+    str: getMod(charData.str),
+    dex: getMod(charData.dex),
+    con: getMod(charData.con),
+    int: getMod(charData.int),
+    wis: getMod(charData.wis),
+    cha: getMod(charData.cha),
+  };
+
+  document.querySelectorAll(".skill-row").forEach((row) => {
+    const ability = row.querySelector(".skill-ability").value;
+    const ranksInput = row.querySelector(".skill-ranks");
+    const miscInput  = row.querySelector(".skill-misc");
+    const trainedBox = row.querySelector(".trained");
+
+    const ranks = parseFloat(ranksInput.value) || 0;
+    const misc  = parseFloat(miscInput.value) || 0;
+    const mod   = modifiers[ability] || 0;
+
+    // === Apply D&D half-rank rule if not trained ===
+    const effectiveRanks = trainedBox.checked ? ranks : ranks / 2;
+
+    const total = Math.trunc(effectiveRanks + misc + mod);
+
+    const totalInput = row.querySelector(".skill-total");
+    if (totalInput) {
+      totalInput.value = total >= 0 ? total.toFixed(0) : total.toFixed(0);
+    }
+  });
+}
+
+
+let userIsFocused = false;
+
+document.addEventListener("focusin", (e) => {
+  if (e.target.matches("input, textarea, [contenteditable]")) {
+    userIsFocused = true;
+  }
+});
+
+document.addEventListener("focusout", (e) => {
+  if (e.target.matches("input, textarea, [contenteditable]")) {
+    userIsFocused = false;
+  }
+});
+
+document.addEventListener('keydown', function(event) {
+  if (userIsFocused) {return}
+
+  if (document.getElementById("spell-navbar").classList.contains("navbar-active")) {
+    if (event.key === "'") {showNavbar("character");showPage("main");}
+    if (event.key === "1") {showPage("spellbook");}
+    if (event.key === "2") {showPage("cast");}
+    if (event.key === "3") {openSettings();}
+    if (event.key === "4") {openSpellManager();}
+  } else {
+    if (event.key === "'") {showNavbar("magic");showPage("spellbook");}
+    if (event.key === "1") {showPage("main");}
+    if (event.key === "2") {showPage("skills");}
+    if (event.key === "3") {showPage("Feats");}
+    if (event.key === "4") {showPage("Equipment");}
+    if (event.key === "5") {showPage("Notes");}
+  }
 });

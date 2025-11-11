@@ -13,7 +13,6 @@ nav {
   height: 56px;
   position: sticky;
   top: 0;
-  z-index: 1000;
   box-shadow: 0 2px 6px rgba(0,0,0,.5);
 }
 
@@ -41,21 +40,31 @@ nav a {
   transition: color 0.2s, text-shadow 0.2s;
 }
 
-nav a:hover {
-  color: var(--accent-blue);
-  text-shadow: 0 0 8px rgba(0, 191, 255, 0.7);
-}
-#nav-main a.active:hover {
+#spell-navbar.navbar-active #nav-magic a {
   color: var(--accent-gold);
   text-shadow: 0 0 8px var(--accent-gold);
-  font-weight: 600;
 }
+
+#character-navbar.navbar-active #nav-character a {
+  color: var(--accent-blue);
+  text-shadow: 0 0 8px var(--accent-blue);
+}
+/* Style only when the character navbar is active */
+nav a:hover {
+  color: var(--accent-gold);
+  text-shadow: 0 0 8px var(--accent-gold);
+}
+#character-navbar a:hover {
+  color: var(--accent-blue);
+  text-shadow: 0 0 8px var(--accent-blue);
+}
+
 nav a.active {
   color: var(--accent-gold);
   text-shadow: 0 0 8px var(--accent-gold);
   font-weight: 600;
 }
-#nav-main a.active {
+#character-navbar a.active {
   color: var(--accent-blue);
   text-shadow: 0 0 8px var(--accent-blue);
   font-weight: 600;
